@@ -9,7 +9,7 @@ To use, add the following to your github action file (e.g. `.github/workflows/os
 on:
   push:
     tags:
-      *
+      - '*'
 
 jobs:
   ossr_new_entry:
