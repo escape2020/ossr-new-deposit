@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     name: A job to upload a new record in the OSSR
     steps:
-      - uses: escape2020/ossr-new-depositn@main
+      - uses: escape2020/ossr-new-deposit@main
         with:
           repository_url: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
           token: ${{ secrets.SANDBOX_ZENODO_TOKEN }}
