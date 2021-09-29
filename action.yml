@@ -14,8 +14,13 @@ inputs:
   release:
     description: release name. can also be "master" or "main". if not given, the last release will be used. if there are no release, main will be used.
     required: false
+  record_id:
+    description: Record id. If not provided, a new record will be created. Otherwise, the existing record is updated.
+    required: false
+    default: 0
 
 runs:
+  if: ${{ record_id == 0}}
   using: "composite"
   steps:
     - uses: actions/checkout@v2
@@ -24,7 +29,23 @@ runs:
         echo "preparation over"
       shell: bash
     - name: upload to OSSR
-      uses: docker://gitlab-registry.in2p3.fr/escape2020/wp3/zenodoci:v1.2
+      uses: docker://gitlab-registry.in2p3.fr/escape2020/wp3/eossr:v0.2
       with:
         entrypoint: upload_new_deposit
         args:  --token ${{ inputs.token }} --sandbox ${{ inputs.sandbox }} --input-dir BUILD_OSSR
+        
+  if: ${{ record_id > 0}}
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+    - run: |
+        ${{ github.action_path }}/zenodo_prepare_upload.sh BUILD_OSSR ${{ inputs.repository_url }} ${{ inputs.release }} 
+        echo "preparation over"
+      shell: bash
+    - name: upload to OSSR
+      uses: docker://gitlab-registry.in2p3.fr/escape2020/wp3/eossr:v0.2
+      with:
+        entrypoint: eossr-upload-new-version-deposit
+        args:  --token ${{ inputs.token }} --sandbox ${{ inputs.sandbox }} --input-dir BUILD_OSSR -id {{ record_id }}
+        
+        
